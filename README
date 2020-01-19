@@ -1,19 +1,9 @@
-Hi, I'm Ramen!
-I'm a very simple TCP-based chat server written in Erlang for a (failed) job application.
-
-Due to "legal reasons", my creator was not allowed to know whether or not I passed inspection.
-
-So please please please, TRY TO BREAK ME!
-
-My creator knows that there's at least one rather careless error in my code, but it's fairly minor. Maybe you can find more?
-
-Make and Run Instructions:
-
+Compile and usage manual:
 make to compile
 make clean to decompile
 erl to start the Erlang shell
-ramen:start(8888) to start the server on port 8888
-ramen:stop() or ctrl+c and then a to stop
+mainServer:start(port) to start the server on port
+mainServer:stop() or ctrl+c and then a to stop
 
 Client Connection Protocol:
 
@@ -23,7 +13,6 @@ MSG username message\r\n = Message a user
 JOIN #room\r\n = Joins existing or creates, then joins a chatroom
 PART #room\r\n = Leaves a joined room, removes room if this was last user in room
 MSG #room message\r\n = Messages all users in a room
-
+BROADCAST message\r\n =send braoadcast message
+PBRO  \r\n = unscubscribe broadcast
 The server will respond with either an OK\r\n or ERROR reason\r\n
-
-Why ramen? It deals with lots of MSG packets.
