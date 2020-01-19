@@ -12,7 +12,7 @@ hasCorrectEnding(M) ->
 		%deleting 5 chars to get rid of "\r\n" ending
 			{ok, string:slice(M, 0, string:length(M)-5)};
 		false ->
-			{error, "Wrong line ending, please end messages with symbols: \n\r"}
+			{error, "Wrong line ending, please end messages with symbols: \r\n"}
 	end.
 
 	

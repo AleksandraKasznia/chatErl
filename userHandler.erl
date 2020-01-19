@@ -1,4 +1,4 @@
--module(noodle).
+-module(userHandler).
 -author("Caz").
 
 -export([recvLoop/4, requester/2, userState/1, userState/3, sender/3]).
@@ -18,7 +18,7 @@ recvLoop(S, P, LastT, Strikes) ->
 		{ok, Data} when length(Data) < 1000 ->
 			case timeCheck(LastT) of
 				{ok, CurT} ->
-					spawn(noodle, requester, [P, Data]),
+					spawn(userHandler, requester, [P, Data]),
 					recvLoop(S, P, CurT, Strikes);
 				{nok, CurT} ->
 					if
@@ -27,7 +27,7 @@ recvLoop(S, P, LastT, Strikes) ->
 							recvLoop(S, P, CurT, Strikes+1);
 						true ->
 							sendError(S, self(), "YOU HAVE BEEN DISCONNECTED FOR REPEAT VIOLATIONS"),
-							P ! seppuku
+							P ! kill
 					end
 			end;
 		{ok, _} ->
@@ -37,10 +37,10 @@ recvLoop(S, P, LastT, Strikes) ->
 					recvLoop(S, P, LastT, Strikes+1);
 				true ->
 					sendError(S, self(), "YOU HAVE BEEN DISCONNECTED FOR REPEAT VIOLATIONS"),
-					P ! seppuku
+					P ! kill
 			end;
 		{error, _} ->
-			P ! seppuku
+			P ! kill
 	end.
 
 timeCheck({LastMegSec, LastSec}) ->
@@ -88,7 +88,7 @@ userState({S, Rx}) ->
 					userState({S, Rx})
 			end;
 		{send, Msg} ->
-			spawn(noodle, sender, [S, self(), Msg]),
+			spawn(userHandler, sender, [S, self(), Msg]),
 			userState({S, Rx});
 		_ ->
 			sendError(S, self(), "YOU ARE NOT LOGGED IN"),
@@ -149,7 +149,7 @@ userState({S, Rx}, Uname, Rooms) ->
 					userState({S, Rx}, Uname, Rooms)
 			end;
 		{send, Msg} ->
-			spawn(noodle, sender, [S, self(), Msg]),
+			spawn(userHandler, sender, [S, self(), Msg]),
 			userState({S, Rx}, Uname, Rooms);
 		{error, Reason} ->
 			sendError(S, self(), Reason),
@@ -165,7 +165,7 @@ userState({S, Rx}, Uname, Rooms) ->
 					sendOk(S, self()),
 					userState({S, Rx})
 			end;
-		seppuku ->
+		kill ->
 			removeFromRooms(self(), Rooms),
 			userlist ! {remove, self()},
 			receive
@@ -211,11 +211,11 @@ sender(S, P, Msg) ->
 		ok ->
 			ok;
 		{error, _} ->
-			P ! seppuku
+			P ! kill
 	end.
 
 sendOk(S, P) ->
-	spawn(noodle, sender, [S, P, "OK\r\n"]).
+	spawn(userHandler, sender, [S, P, "OK\r\n"]).
 
 sendError(S, P, Reason) ->
-	spawn(noodle, sender, [S, P, ["ERROR ", Reason, "\r\n"]]).
+	spawn(userHandler, sender, [S, P, ["ERROR ", Reason, "\r\n"]]).
