@@ -1,5 +1,5 @@
 -module(userHandler).
--author("Caz").
+-author('Aleksandra Kasznia, Marcin Grzyb').
 
 -export([recvLoop/4, requester/2, userState/1, userState/3, sender/3]).
 
@@ -131,7 +131,7 @@ userState({S, Rx}, Uname, Rooms) ->
 		{msg, room, Room, Msg} ->
 			case getRoomPid(Room, Rooms) of
 				{ok, RPid} ->
-					RPid ! {send, ["GOTROOMMSG ", Uname, " ", Room, " ", Msg]},
+					RPid ! {send, ["Message from ", Uname, " in room ", Room, ": ", Msg]},
 					sendOk(S, self());
 				{error, Reason} ->
 					sendError(S, self(), Reason)
@@ -141,7 +141,7 @@ userState({S, Rx}, Uname, Rooms) ->
 			userlist ! {getpid, self(), User},
 			receive
 				{ok, UPid} ->
-					UPid ! {send, ["GOTUSERMSG ", Uname, " ", Msg]},
+					UPid ! {send, ["Got message from", Uname, ": ", Msg]},
 					sendOk(S, self()),
 					userState({S, Rx}, Uname, Rooms);
 				{error, Reason} ->

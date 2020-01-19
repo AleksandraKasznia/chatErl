@@ -1,5 +1,5 @@
 -module(mainServer).
--author('Caz').
+-author('Aleksandra Kasznia, Marcin Grzyb').
 
 -export([start/1, stop/0, listen/3, accept/1]).
 
