@@ -58,7 +58,7 @@ timeCheck({LastMegSec, LastSec}) ->
 	end.
 				
 requester(P, Data) ->
-	case sanity:checkInput(Data) of
+	case handleInput:checkInput(Data) of
 		{ok, login, Uname} ->
 			P ! {login, Uname};
 		{ok, logout} ->

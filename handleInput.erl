@@ -1,5 +1,5 @@
 -module(handleInput).
--author('Caz').
+-author('Aleksandra Kasznia, Marcin Grzyb').
 
 -export([checkInput/1]).
 % This module handles user input.
@@ -15,75 +15,58 @@ hasCorrectEnding(M) ->
 			{error, "Wrong line ending, please end messages with symbols: \n\r"}
 	end.
 
+	
+%passes list of available commands
+checkCommand(C) ->
+	checkCommand(C,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "PART ", "HELP ", "LIST "]).
 
-checkBreaks(S) ->
-	HasR = fun(X) -> if X == 13 -> true; true -> false end end,
-	HasN = fun(X) -> if X == 10 -> true; true -> false end end,
-	case lists:any(HasN, S) of
+checkCommand(_,[]) ->
+	{error, "Not a valid command"};
+checkCommand(C,[Cur|Rest]) ->
+	case lists:prefix(Cur, C) of
 		true ->
-			{error, "ILLEGAL LINE BREAK IN MESSAGE"};
+			{ok,  lists:subtract(Cur, " "), lists:subtract(C, Cur)};
 		false ->
-			case lists:any(HasR, S) of
-				true ->
-					{error, "ILLEGAL LINE BREAK IN MESSAGE"};
-				false ->
-					{ok, S}
-			end
+			checkCommand(C, Rest)
 	end.
 
-checkStart(S) ->
-	checkStart(S,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "PART ", "HELP ", "LIST "]).
-
-checkStart(_,[]) ->
-	{error, "NOT A PROPER COMMAND"};
-checkStart(S,[Cur|Rest]) ->
-	case lists:prefix(Cur, S) of
-		true ->
-			{ok,  lists:subtract(Cur, " "), lists:subtract(S, Cur)};
-		false ->
-			checkStart(S, Rest)
-	end.
-
-parseStart(S) ->
-	case checkStart(S) of
+parseCommand(C) ->
+	case checkCommand(C) of
 		{ok, Command, Data} ->
 			case Command of
 				"LOGIN" ->
 					checkLogin(Data);
-				"LOGOUT" ->
-					checkLogout(Data);
+				"MSG" ->
+					checkMsg(Data);
 				"JOIN" ->
 					checkJoin(Data);
 				"PART" ->
 					checkPart(Data);
-				"MSG" ->
-					checkMsg(Data);
+				"LOGOUT" ->
+					checkLogout(Data);
 				_ ->
-					{error, "NOT A PROPER COMMAND"}
+					{error, "Not a valid command"}
 			end;
-		{error, Msg} ->
-			{error, Msg}
+		{error, Why} ->
+			{error, Why}
 	end.
 
-checkInput(S) ->
-	case hasCorrectEnding(S) of
-		{ok, NewS} ->
-			case checkBreaks(NewS) of
-				{ok, NewS} ->
-					parseStart(NewS);
-				{error, Reason} ->
-					{error, Reason}
-			end;
-		{error, Reason} ->
-			{error, Reason}
+checkInput(M) ->
+	case hasCorrectEnding(M) of
+		{ok, NewM} ->
+			parseCommand(NewM);
+		{error, Why} ->
+			{error, Why}
 	end.
 
-checkSpace(Txt) ->
-	HasSp = fun(X) -> if X == 32 -> true; true -> false end end,
-	lists:any(HasSp, Txt).
+containsSpaceChar(M) ->
+%using numerical value of space character
+	ContainsSpace = fun(X) -> if X == 32 -> true; true -> false end end,
+	lists:any(ContainsSpace, M).
 
-checkStartHash(Txt) ->
-	case lists:nth(1, Txt) of
+containsHashChar(M) ->
+%using numerical value of hash character
+	case lists:nth(1, M) of
 		35 ->
 			true;
 		_ ->
@@ -91,53 +74,24 @@ checkStartHash(Txt) ->
 	end.
 
 checkLogin([]) ->
-	{error, "NO USERNAME SPECIFIED"};
+	{error, "Please provide username"};
 checkLogin(Uname) ->
-	case checkSpace(Uname) of
+	case containsSpaceChar(Uname) of
 		true ->
-			{error, "NO SPACES ALLOWED IN USERNAME"};
+			{error, "Spaces are not allowed in a username"};
 		false ->
-			case checkStartHash(Uname) of
+			case containsHashChar(Uname) of
 				true ->
-					{error, "USERNAME MAY NOT START WITH #"};
+					{error, "Username can't start with #"};
 				false ->
 					{ok, login, Uname}
 			end
 	end.
-
-checkLogout(_) ->
-	{ok, logout}.
-
-checkJoin(Room) ->
-	case checkSpace(Room) of
-		true ->
-			{error, "NO SPACES ALLOWED IN ROOMNAME"};
-		false ->
-			case checkStartHash(Room) of
-				true ->
-					{ok, join, Room};
-				false ->
-					{error, "ROOMNAME MUST START WITH #"}
-			end
-	end.
-
-checkPart(Room) ->
-	case checkSpace(Room) of
-		true ->
-			{error, "NO SPACES ALLOWED IN ROOMNAME"};
-		false ->
-			case checkStartHash(Room) of
-				true ->
-					{ok, part, Room};
-				false ->
-					{error, "ROOMNAME MUST START WITH #"}
-			end
-	end.
-
+	
 checkMsg(Msg) ->
 	case checkMsgData(Msg) of
 		{ok, To, Txt} ->
-			case checkStartHash(Msg) of
+			case containsHashChar(Msg) of
 				true ->
 					{ok, message, room, To, [Txt,"\r\n"]};
 				false ->
@@ -152,18 +106,50 @@ checkMsgData(Msg) ->
 	checkMsgData(Msg, []).
 
 checkMsgData([], A) ->
-	{error, "MALFORMED MESSAGE", A};
+	{error, "Wrong message format", A};
 checkMsgData([Cur|Rest], A) ->
 	case Cur of
 		32 ->
 			case A of
 				[] ->
-					{error, "DESTINATION USER OR ROOM NOT SPECIFIED", Rest};
+					{error, "Please specify destination - provide valid username or room name", Rest};
 				[35] ->
-					{error, "DESTINATION ROOM NOT SPECIFIED", Rest};
+					{error, "Room name not specified", Rest};
 				_ ->
 					{ok, A, Rest}
 			end;
 		_ ->
 			checkMsgData(Rest, lists:append([A, [Cur]]))
 	end.
+
+checkJoin([]) ->
+	{error, "Please provide room name"};
+	
+checkJoin(Room) ->
+	case containsSpaceChar(Room) of
+		true ->
+			{error, "Space are not allowed in a room name"};
+		false ->
+			case containsHashChar(Room) of
+				true ->
+					{ok, join, Room};
+				false ->
+					{error, "Room name has to start with #"}
+			end
+	end.
+
+checkPart(Room) ->
+	case containsSpaceChar(Room) of
+		true ->
+			{error, "Space are not allowed in a room name"};
+		false ->
+			case containsHashChar(Room) of
+				true ->
+					{ok, part, Room};
+				false ->
+					{error, "Room name has to start with #"}
+			end
+	end.
+
+checkLogout(_) ->
+	{ok, logout}.
