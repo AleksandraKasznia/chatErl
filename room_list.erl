@@ -1,30 +1,30 @@
 -module(room_list).
 -author('Aleksandra Kasznia, Marcin Grzyb').
 
--export([roomList/1, roomState/1, roomSendMsg/2]).
+-export([rooms/1, roomState/1, roomSendMsg/2]).
 % This module handles chat rooms.
 
 
 %list of all rooms currently available
-roomList(CurrentState) ->
+rooms(CurrentState) ->
 %if the room exists returns room's pid and passes user id to requested room
 	receive
 		{getpid, P, Room} ->
 			case getPid(Room, CurrentState) of
 				{ok, Pid} ->
 					P ! {ok, Pid},
-					roomList(CurrentState);
+					rooms(CurrentState);
 				{error, createNew} ->
 %if the room doesn't exist then create new one and call function again to execute actions described in comment above for the newly created room
 					NewPid = spawn(room_list, roomState, [[]]),
 					P ! {ok, NewPid},
-					roomList([{Room, NewPid} | CurrentState]);
+					rooms([{Room, NewPid} | CurrentState]);
 				_ ->
-					roomList(CurrentState)
+					rooms(CurrentState)
 			end;
 		{remove, P} ->
 			NewList = removeRoom(P, CurrentState),
-			roomList(NewList)
+			rooms(NewList)
 	end.
 
 	

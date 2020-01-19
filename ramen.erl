@@ -8,8 +8,8 @@
 % module titled noodle.
 
 start(Port) ->
-	U = spawn(ulist, userList, [[]]),
-	R = spawn(room_list, roomList, [[]]),
+	U = spawn(user_list, users, [[]]),
+	R = spawn(room_list, rooms, [[]]),
 	register(userlist, U),
 	register(roomlist, R),
 	register(listener, spawn(ramen, listen, [Port, U, R])).
