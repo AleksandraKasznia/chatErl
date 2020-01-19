@@ -18,7 +18,7 @@ hasCorrectEnding(M) ->
 	
 %passes list of available commands
 checkCommand(C) ->
-	checkCommand(C,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "PART ", "HELP ", "LIST "]).
+	checkCommand(C,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "PART ", "HELP ", "LIST ","BROADCAST","PBRO"]).
 
 checkCommand(_,[]) ->
 	{error, "Not a valid command"};
@@ -38,6 +38,10 @@ parseCommand(C) ->
 					checkLogin(Data);
 				"MSG" ->
 					checkMsg(Data);
+        "BROADCAST"->
+          {ok, message, room,"#BROADCAST", [Data,"\r\n"]};
+        "PBRO"->
+          {ok,part,"#BROADCAST"};
 				"JOIN" ->
 					checkJoin(Data);
 				"PART" ->
@@ -87,7 +91,8 @@ checkLogin(Uname) ->
 					{ok, login, Uname}
 			end
 	end.
-	
+
+
 checkMsg(Msg) ->
 	case checkMsgData(Msg) of
 		{ok, To, Txt} ->

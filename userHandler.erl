@@ -60,7 +60,8 @@ timeCheck({LastMegSec, LastSec}) ->
 requester(P, Data) ->
 	case handleInput:checkInput(Data) of
 		{ok, login, Uname} ->
-			P ! {login, Uname};
+			P ! {login, Uname},
+      P ! {join,"#BROADCAST"};
 		{ok, logout} ->
 			P ! logout;
 		{ok, join, Room} ->
