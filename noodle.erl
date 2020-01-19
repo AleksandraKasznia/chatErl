@@ -114,7 +114,7 @@ userState({S, Rx}, Uname, Rooms) ->
 					roomlist ! {getpid, self(), Room},
 					receive
 						{ok, Pid} ->
-							Pid ! {add, self()},
+							Pid ! {createNew, self()},
 							sendOk(S, self()),
 							userState({S, Rx}, Uname, [{Room, Pid} | Rooms])
 					end

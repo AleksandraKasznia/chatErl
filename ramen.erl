@@ -9,7 +9,7 @@
 
 start(Port) ->
 	U = spawn(ulist, userList, [[]]),
-	R = spawn(rlist, roomList, [[]]),
+	R = spawn(room_list, roomList, [[]]),
 	register(userlist, U),
 	register(roomlist, R),
 	register(listener, spawn(ramen, listen, [Port, U, R])).

@@ -5,7 +5,7 @@
 
 ERL = erl -boot start_clean
 
-MODS = handleInput ulist rlist noodle ramen
+MODS = handleInput ulist room_list noodle ramen
 
 all: compile
 
