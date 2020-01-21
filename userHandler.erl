@@ -69,6 +69,7 @@ requester(P, Data) ->
 		{ok, list} ->
 			P ! list;
 		{ok, part, Room} ->
+      P ! {goodbye, room, Room},
 			P ! {part, Room};
 		{ok, message, room, Room, Msg} ->
 			P ! {msg, room, Room, Msg};
@@ -140,6 +141,14 @@ userState({S, Rx}, Uname, Rooms) ->
 					sendError(S, self(), Reason)
 			end,
 			userState({S, Rx}, Uname, Rooms);
+    {goodbye, room, Room} ->
+      case getRoomPid(Room, Rooms) of
+        {ok, RPid} ->
+          RPid ! {send, [ Uname, " left room: ", Room]};
+        {error, Reason} ->
+          sendError(S, self(), Reason)
+      end,
+      userState({S, Rx}, Uname, Rooms);
 		{msg, user, User, Msg} ->
 			userlist ! {getpid, self(), User},
 			receive
