@@ -66,6 +66,8 @@ requester(P, Data) ->
 			P ! logout;
 		{ok, join, Room} ->
 			P ! {join, Room};
+		{ok, list} ->
+			P ! list;
 		{ok, part, Room} ->
 			P ! {part, Room};
 		{ok, message, room, Room, Msg} ->
@@ -158,6 +160,9 @@ userState({S, Rx}, Uname, Rooms) ->
 		{login, _} ->
 			sendError(S, self(), "YOU ARE ALREADY LOGGED IN"),
 			userState({S, Rx}, Uname, Rooms);
+		list ->
+			printList(S, self(), Rooms),
+			userState({S, Rx}, Uname, Rooms);
 		logout ->
 			removeFromRooms(self(), Rooms),
 			userlist ! {remove, self()},
@@ -176,6 +181,7 @@ userState({S, Rx}, Uname, Rooms) ->
 					ok
 			end
 	end.
+
 
 removeRoom(P, Room, Rooms) ->
 	removeRoom(P, Room, Rooms, []).
@@ -215,6 +221,11 @@ sender(S, P, Msg) ->
 			P ! kill
 	end.
 
+printList(S,P, Rooms) ->
+	R= io_lib:format("~p",[Rooms]),
+	lists:flatten(R),
+	spawn(userHandler, sender, [S, P, lists:append(R,"\r\n")]).
+	
 sendOk(S, P) ->
 	spawn(userHandler, sender, [S, P, "OK\r\n"]).
 

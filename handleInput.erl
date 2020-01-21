@@ -48,6 +48,8 @@ parseCommand(C) ->
 					checkPart(Data);
 				"LOGOUT" ->
 					checkLogout(Data);
+				"LIST" ->
+					{ok, list};
 				_ ->
 					{error, "Not a valid command"}
 			end;
