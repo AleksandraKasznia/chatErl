@@ -7,12 +7,12 @@ mainServer:stop() or ctrl+c and then a to stop
 
 Client Connection Protocol:
 
-LOGIN username\r\n = Login
-LOGOUT\r\n = Logout
-MSG username message\r\n = Message a user
-JOIN #room\r\n = Joins existing or creates, then joins a chatroom
-PART #room\r\n = Leaves a joined room, removes room if this was last user in room
-MSG #room message\r\n = Messages all users in a room
-BROADCAST message\r\n =send braoadcast message
-PBRO  \r\n = unscubscribe broadcast
+LOGIN username = Login
+LOGOUT= Logout
+MSG username message = Message a user
+JOIN #room = Joins existing or creates, then joins a chatroom
+PART #room= Leaves a joined room, removes room if this was last user in room
+MSG #room message = Messages all users in a room
+BROADCAST message =send braoadcast message
+PBRO = unscubscribe broadcast
 The server will respond with either an OK\r\n or ERROR reason\r\n
