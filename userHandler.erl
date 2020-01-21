@@ -153,7 +153,7 @@ userState({S, Rx}, Uname, Rooms) ->
 			userlist ! {getpid, self(), User},
 			receive
 				{ok, UPid} ->
-					UPid ! {send, ["Got message from", Uname, ": ", Msg]},
+					UPid ! {send, ["Got message from ", Uname, ": ", Msg]},
 					sendOk(S, self()),
 					userState({S, Rx}, Uname, Rooms);
 				{error, Reason} ->

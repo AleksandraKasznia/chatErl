@@ -108,7 +108,7 @@ checkMsg(Msg) ->
 				true ->
 					{ok, message, room, To, [Txt,"\r\n"]};
 				false ->
-					{ok, message, user, To, Txt,["\r\n"]}
+					{ok, message, user, To, [Txt,"\r\n"]}
 			end;
 		{error, Info, Data} ->
 			{error, lists:append([Info, Data])}
