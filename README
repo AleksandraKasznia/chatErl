@@ -11,8 +11,8 @@ LOGIN username = Login
 LOGOUT= Logout
 MSG username message = Message a user
 JOIN #room = Joins existing or creates, then joins a chatroom
-PART #room= Leaves a joined room, removes room if this was last user in room
+LEAVE #room= Leaves a joined room, removes room if this was last user in room
 MSG #room message = Messages all users in a room
 BROADCAST message =send braoadcast message
-PBRO = unscubscribe broadcast
+LBRO = unscubscribe broadcast
 The server will respond with either an OK\r\n or ERROR reason\r\n

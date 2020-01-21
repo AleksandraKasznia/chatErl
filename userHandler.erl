@@ -68,9 +68,9 @@ requester(P, Data) ->
 			P ! {join, Room};
 		{ok, list} ->
 			P ! list;
-		{ok, part, Room} ->
+		{ok, leave, Room} ->
       P ! {goodbye, room, Room},
-			P ! {part, Room};
+			P ! {leave, Room};
 		{ok, message, room, Room, Msg} ->
 			P ! {msg, room, Room, Msg};
 		{ok, message, user, User, Msg} ->
@@ -123,7 +123,7 @@ userState({S, Rx}, Uname, Rooms) ->
 							userState({S, Rx}, Uname, [{Room, Pid} | Rooms])
 					end
 			end;
-		{part, Room} ->
+		{leave, Room} ->
 			case removeRoom(self(), Room, Rooms) of
 				{ok, NewRooms} ->
 					sendOk(S, self()),

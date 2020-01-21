@@ -1,12 +1,12 @@
 -module(handleInput).
 -author('Aleksandra Kasznia, Marcin Grzyb').
 
--export([checkInput/1,hasCorrectEnding/1]).
+-export([checkInput/1,parseInput/1]).
 % This module handles user input.
 
 
 %checks if user ended message correctly - with "\r\n"
-hasCorrectEnding(M) ->
+parseInput(M) ->
 	case string:find(M, "\r\n")  of
 		nomatch ->
       case string:find(M, "\n") of
@@ -24,7 +24,7 @@ hasCorrectEnding(M) ->
 	
 %passes list of available commands
 checkCommand(C) ->
-	checkCommand(C,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "PART ", "HELP ", "LIST ","BROADCAST","PBRO","LIST" ]).
+	checkCommand(C,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "LEAVE ","LIST ","BROADCAST","LBRO","LIST" ]).
 
 checkCommand(_,[]) ->
 	{error, "Not a valid command\r\n"};
@@ -46,12 +46,12 @@ parseCommand(C) ->
 					checkMsg(Data);
         "BROADCAST"->
           {ok, message, room,"#BROADCAST", [Data,"\r\n"]};
-        "PBRO"->
-          {ok,part,"#BROADCAST"};
+        "LBRO"->
+          {ok,leave,"#BROADCAST"};
 				"JOIN" ->
 					checkJoin(Data);
-				"PART" ->
-					checkPart(Data);
+				"LEAVE" ->
+					checkLeave(Data);
 				"LOGOUT" ->
 					checkLogout(Data);
 				"LIST" ->
@@ -64,7 +64,7 @@ parseCommand(C) ->
 	end.
 
 checkInput(M) ->
-	case hasCorrectEnding(M) of
+	case parseInput(M) of
 		{ok, NewM} ->
 			parseCommand(NewM);
 		{error, Why} ->
@@ -151,14 +151,14 @@ checkJoin(Room) ->
 			end
 	end.
 
-checkPart(Room) ->
+checkLeave(Room) ->
 	case containsSpaceChar(Room) of
 		true ->
 			{error, "Space are not allowed in a room name"};
 		false ->
 			case containsHashChar(Room) of
 				true ->
-					{ok, part, Room};
+					{ok, leave, Room};
 				false ->
 					{error, "Room name has to start with #"}
 			end
