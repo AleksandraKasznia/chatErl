@@ -24,7 +24,7 @@ hasCorrectEnding(M) ->
 	
 %passes list of available commands
 checkCommand(C) ->
-	checkCommand(C,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "PART ", "HELP ", "LIST ","BROADCAST","PBRO"]).
+	checkCommand(C,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "PART ", "HELP ", "LIST ","BROADCAST","PBRO","LIST" ]).
 
 checkCommand(_,[]) ->
 	{error, "Not a valid command\r\n"};
