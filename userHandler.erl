@@ -233,7 +233,7 @@ sender(S, P, Msg) ->
 printList(S,P, Rooms) ->
 	R= io_lib:format("~p",[Rooms]),
 	lists:flatten(R),
-	spawn(userHandler, sender, [S, P, lists:append(R)]).
+	spawn(userHandler, sender, [S, P, lists:append(R,"\r\n")]).
 	
 sendOk(S, P) ->
 	spawn(userHandler, sender, [S, P, "OK\r\n"]).
