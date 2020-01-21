@@ -1,18 +1,24 @@
 -module(handleInput).
 -author('Aleksandra Kasznia, Marcin Grzyb').
 
--export([checkInput/1]).
+-export([checkInput/1,hasCorrectEnding/1]).
 % This module handles user input.
 
 
 %checks if user ended message correctly - with "\r\n"
 hasCorrectEnding(M) ->
-	case (string:find(M, "\r\n") > 0) of
-		true ->
-		%deleting 5 chars to get rid of "\r\n" ending
-			{ok, string:slice(M, 0, string:length(M)-5)};
-		false ->
-			{error, "Wrong line ending, please end messages with symbols: \r\n"}
+	case string:find(M, "\r\n")  of
+		nomatch ->
+      case string:find(M, "\n") of
+        nomatch->
+          {ok, M};
+        _->
+          %deleting "\n" ending
+            {ok, string:slice(M, 0, string:length(M)-1)}
+      end;
+    _->
+      %deleting "\r\n" ending
+      {ok, string:slice(M, 0, string:length(M)-1)}
 	end.
 
 	
@@ -21,7 +27,7 @@ checkCommand(C) ->
 	checkCommand(C,["LOGIN ", "LOGOUT", "MSG ", "JOIN ", "PART ", "HELP ", "LIST ","BROADCAST","PBRO"]).
 
 checkCommand(_,[]) ->
-	{error, "Not a valid command"};
+	{error, "Not a valid command\r\n"};
 checkCommand(C,[Cur|Rest]) ->
 	case lists:prefix(Cur, C) of
 		true ->
@@ -102,7 +108,7 @@ checkMsg(Msg) ->
 				true ->
 					{ok, message, room, To, [Txt,"\r\n"]};
 				false ->
-					{ok, message, user, To, [Txt,"\r\n"]}
+					{ok, message, user, To, Txt,["\r\n"]}
 			end;
 		{error, Info, Data} ->
 			{error, lists:append([Info, Data])}

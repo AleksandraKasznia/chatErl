@@ -76,7 +76,7 @@ requester(P, Data) ->
 		{ok, message, user, User, Msg} ->
 			P ! {msg, user, User, Msg};
 		{error, Reason} ->
-			P ! {send, ["ERROR ",Reason, "\r\n"]}
+			P ! {send, ["ERROR ",Reason]}
 	end.
 
 userState({S, Rx}) ->
@@ -144,7 +144,7 @@ userState({S, Rx}, Uname, Rooms) ->
     {goodbye, room, Room} ->
       case getRoomPid(Room, Rooms) of
         {ok, RPid} ->
-          RPid ! {send, [ Uname, " left room: ", Room]};
+          RPid ! {send, [ Uname, " left room: ", Room,"\r\n"]};
         {error, Reason} ->
           sendError(S, self(), Reason)
       end,
@@ -233,10 +233,10 @@ sender(S, P, Msg) ->
 printList(S,P, Rooms) ->
 	R= io_lib:format("~p",[Rooms]),
 	lists:flatten(R),
-	spawn(userHandler, sender, [S, P, lists:append(R,"\r\n")]).
+	spawn(userHandler, sender, [S, P, lists:append(R)]).
 	
 sendOk(S, P) ->
 	spawn(userHandler, sender, [S, P, "OK\r\n"]).
 
 sendError(S, P, Reason) ->
-	spawn(userHandler, sender, [S, P, ["ERROR ", Reason, "\r\n"]]).
+	spawn(userHandler, sender, [S, P, ["ERROR ", Reason,"\r\n"]]).
