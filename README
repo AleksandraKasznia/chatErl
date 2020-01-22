@@ -15,4 +15,4 @@ LEAVE #room= Leaves a joined room, removes room if this was last user in room
 MSG #room message = Messages all users in a room
 BROADCAST message =send braoadcast message
 LBRO = unscubscribe broadcast
-The server will respond with either an OK\r\n or ERROR reason\r\n
+The server will respond with either an OK or ERROR reason
