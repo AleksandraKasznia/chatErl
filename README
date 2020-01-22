@@ -3,7 +3,7 @@ make to compile
 make clean to decompile
 erl to start the Erlang shell
 mainServer:start(port) to start the server on port
-mainServer:stop() or ctrl+c and then a to stop
+ctrl+c and then a to stop
 
 Client Connection Protocol:
 
