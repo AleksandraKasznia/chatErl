@@ -1,11 +1,10 @@
 Compile and usage manual:
 make to compile
-make clean to decompile
 erl to start the Erlang shell
 mainServer:start(port) to start the server on port
 ctrl+c and then a to stop
 
-Client Connection Protocol:
+Client Commands:
 
 LOGIN username = Login
 LOGOUT= Logout

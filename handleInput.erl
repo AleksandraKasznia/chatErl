@@ -4,8 +4,6 @@
 -export([checkInput/1,parseInput/1]).
 % This module handles user input.
 
-
-%checks if user ended message correctly - with "\r\n"
 parseInput(M) ->
 	case string:find(M, "\r\n")  of
 		nomatch ->
