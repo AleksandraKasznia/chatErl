@@ -9,7 +9,7 @@
 % When a user connects, a receive loop and a User State process are created
 % and associated with that particular connection.
 % The Receive Loop is used to receive messages from the user and send them
-% through the input checker "sanity". The Receive Loop is also responsible
+% through the input checker. The Receive Loop is also responsible
 % for making sure the user is not sending messages that are too long or too
 % frequent. Repeated violations of these stipulations results in being kicked.
 recvLoop(S, P, LastT, Strikes) ->
